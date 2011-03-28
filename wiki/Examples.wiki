@@ -1,0 +1,14 @@
+{{{
+$code_params = array(
+        'text' => 'http://qr.littleidiot.be', 
+        'backgroundColor' => '#FFFFCC',
+        'foreColor' => '#CC0000',
+        'padding' => 8,
+        'moduleSize' => 20);
+
+$renderer_params = array(
+        'imageType' => 'png',
+        'returnResource' => false);
+        
+Zend_Matrixcode::render('qrcode', $code_params, 'image', $renderer_params);
+}}}

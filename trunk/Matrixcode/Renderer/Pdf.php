@@ -122,12 +122,12 @@ class Zend_Matrixcode_Renderer_Pdf extends Zend_Matrixcode_Renderer_Abstract
 		$page->translate(floor($page_width - $output_size_width) / 2, ($page_height - $output_size_height) / 2);
 		
 		if(!empty($back_color)) {
-			$back_color = new Zend_Pdf_Color_HTML('#' . dechex($back_color));
+			$back_color = new Zend_Pdf_Color_HTML('#' . $this->_decimalToHTMLColor($back_color));
 			$page->setFillColor($back_color);
 			$page->drawRectangle(0,0,$output_size_width,$output_size_height,Zend_Pdf_Page::SHAPE_DRAW_FILL);
 		}
 		
-		$page->setFillColor(new Zend_Pdf_Color_HTML('#' . dechex($fore_color)));
+		$page->setFillColor(new Zend_Pdf_Color_HTML('#' . $this->_decimalToHTMLColor($fore_color)));
 		
 		// Convert the matrix into pixels
     	$matrix = $this->_matrixcode->getMatrix();

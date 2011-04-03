@@ -49,9 +49,11 @@ abstract class Zend_Matrixcode_Renderer_Abstract
 	
 	/**
 	 * Whether to return the result or send it to the client
-	 * @var boolean
+	 * An array can be used to specify additional headers that should be sent along
+	 * (f.i. a Content-Disposition header to send output as attachment)
+	 * @var boolean | array
 	 */
-	protected $_return_resource = false;
+	protected $_send_result = true;
 	
 	
 	
@@ -111,22 +113,22 @@ abstract class Zend_Matrixcode_Renderer_Abstract
     
     
     /**
-     * Set the 'return resource' flag
-     * @param bool $bool
+     * Set the 'send result' flag
+     * @param bool|array $bool
      */
-    public function setReturnResource($bool)
+    public function setSendResult($value)
     {
-    	$this->_return_resource = (bool) $bool;
+    	$this->_send_result = $value;
     	return $this;
     }
     
     /**
-     * Retrieve the 'return resource' flag
+     * Retrieve the 'send result' flag
      * @return bool
      */
-    public function getReturnResource()
+    public function getSendResult()
     {
-    	return $this->_return_resource;
+    	return $this->_send_result;
     }
 	
 	
@@ -147,7 +149,7 @@ abstract class Zend_Matrixcode_Renderer_Abstract
 	public function render()
 	{
 		$this->_checkParams();
-		$this->_renderMatrixcode();
+		return $this->_renderMatrixcode();
 	}
 	
 	

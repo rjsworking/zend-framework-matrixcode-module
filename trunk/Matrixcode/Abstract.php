@@ -192,14 +192,14 @@ abstract class Zend_Matrixcode_Abstract
      */
     public function setForeColor($value)
     {
-        if (preg_match('`\#[0-9A-F]{6}`', $value)) {
+        if (preg_match('`\#[0-9A-Fa-f]{6}`', $value)) {
             $this->_fr_color = hexdec($value);
         } elseif (is_numeric($value) && $value >= 0 && $value <= 16777125) {
             $this->_fr_color = intval($value);
         } else {
             require_once 'Zend/Matrixcode/Exception.php';
             throw new Zend_Matrixcode_Exception(
-                'Fore color must be set as #[0-9A-F]{6}'
+                'Fore color must be set as #[0-9A-Fa-f]{6}'
             );
         }
         return $this;

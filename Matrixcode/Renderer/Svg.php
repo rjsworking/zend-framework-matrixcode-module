@@ -84,7 +84,7 @@ class Zend_Matrixcode_Renderer_Svg extends Zend_Matrixcode_Renderer_Abstract
   		'<desc></desc>'."\n";
   		
     	if(!empty($back_color)) {
-			$backgroundcolor = dechex($back_color);
+			$backgroundcolor = $this->_decimalToHTMLColor($back_color);
   			$output .= '<rect width="'.$output_size_width.'" height="'.$output_size_height.'" fill="#'.$backgroundcolor.'" cx="0" cy="0" />'."\n";
   		}
   		
@@ -92,7 +92,7 @@ class Zend_Matrixcode_Renderer_Svg extends Zend_Matrixcode_Renderer_Abstract
   		'<defs>'."\n".
     	'<rect id="p" width="'.$scale.'" height="'.$scale.'" />'."\n".
   		'</defs>'."\n".
-  		'<g fill="#'.dechex($fore_color).'">'."\n";
+  		'<g fill="#'.$this->_decimalToHTMLColor($fore_color).'">'."\n";
   		
   		
 		// Convert the matrix into pixels

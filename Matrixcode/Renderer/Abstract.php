@@ -144,6 +144,16 @@ abstract class Zend_Matrixcode_Renderer_Abstract
 	
 	
 	/**
+	 * Converts decimal color into HTML notation
+	 * @param int $color
+	 */
+	protected function _decimalToHTMLColor($color)
+	{
+		return str_pad(dechex($color),6,'0',STR_PAD_LEFT);
+	}
+	
+	
+	/**
 	 * Render method
 	 */
 	public function render()

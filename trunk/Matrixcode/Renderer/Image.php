@@ -22,7 +22,7 @@ require_once 'Zend/Matrixcode/Renderer/Abstract.php';
 
 
 /**
- * Zend_Matrixcode_Renderer_Abstract
+ * Zend_Matrixcode_Renderer_Image
  *
  * @package    Zend_Matrixcode
  * @copyright  Copyright (c) 2009-2011 Peter Minne <peter@inthepocket.mobi>
@@ -118,7 +118,7 @@ class Zend_Matrixcode_Renderer_Image extends Zend_Matrixcode_Renderer_Abstract
 		if($module_size[0] != $module_size[1]) {
 			require_once 'Zend/Matrixcode/Renderer/Exception.php';
             throw new Zend_Matrixcode_Renderer_Exception(
-                'A module of a QR code needs to be square. The current module size settings of '.$module_size[0].'x'.$module_size[1].' indicate a different form.'
+                'So far only square modules are supported. The current module size settings of '.$module_size[0].'x'.$module_size[1].' indicate a different rectangular shape.'
             );
 		}
 		return $module_size[0];
@@ -189,14 +189,31 @@ class Zend_Matrixcode_Renderer_Image extends Zend_Matrixcode_Renderer_Abstract
 		
 		@imagedestroy($canvas);
 		
-		if($this->_return_resource) {
+		if($this->_send_result) {
+			$this->_sendOutput($output_image);
+		}else{
 			return $output_image;
+		}
+		
+		return;
+	}
+	
+	
+	
+	protected function _sendOutput($output)
+	{
+		if(is_array($this->_send_result)) {
+			foreach($this->_send_result as $header) {
+				header($header);
+			}
 		}
 		
 		header("Content-Type: image/" . $this->_imageType);
         $functionName = 'image' . $this->_imageType;
-        call_user_func($functionName, $output_image);
-        @imagedestroy($output_image);
+	    call_user_func($functionName, $output);
+	    @imagedestroy($output);
+	    
+	    exit();
 	}
 	
 }

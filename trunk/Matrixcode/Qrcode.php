@@ -78,6 +78,11 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
 	 */
 	protected $_maskData = array();
 	
+	/**
+	 * 2D pattern matrix
+	 * @var array
+	 */
+	protected $_patternMatrix = array();
 	
 	
 
@@ -689,21 +694,19 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
      */
     protected function _preparePatternMatrix()
     {
-    	$matrix = array();
-    	$this->_setFinderPatterns($matrix);
-    	$this->_setTimingPatterns($matrix);
-    	$this->_setAlignmentPatterns($matrix);
-    	$this->_setVersionPatterns($matrix);
-    	
-    	return $matrix;
+    	$this->_setFinderPatterns();
+    	$this->_setTimingPatterns();
+    	$this->_setAlignmentPatterns();
+    	$this->_setVersionPatterns();
+
+		return $this->_patternMatrix;
     }
     
     
     /**
      * Set the 3 finder patterns in the corners
-     * @param array $matrix
      */
-    protected function _setFinderPatterns (&$matrix)
+    protected function _setFinderPatterns ()
     {
     	$matrix_dimension = $this->_getMatrixDimension();
     	
@@ -716,41 +719,39 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
     	foreach($patternRelativeOffsets as $pattern) {
     		// 7x7 border
     		for($i=0; $i<7; $i++) {
-    			$matrix[$pattern['x'] + $i][$pattern['y']] = 1;
-    			$matrix[$pattern['x'] + 6][$pattern['y'] + $i] = 1;
-    			$matrix[$pattern['x'] + $i][$pattern['y'] + 6] = 1;
-    			$matrix[$pattern['x']][$pattern['y'] + $i] = 1;
+    			$this->_patternMatrix[$pattern['x'] + $i][$pattern['y']] = 1;
+    			$this->_patternMatrix[$pattern['x'] + 6][$pattern['y'] + $i] = 1;
+    			$this->_patternMatrix[$pattern['x'] + $i][$pattern['y'] + 6] = 1;
+    			$this->_patternMatrix[$pattern['x']][$pattern['y'] + $i] = 1;
     		}
     		// filled 3x3 square
     		for($j=0; $j<9; $j++)  {
     			$x = $pattern['x'] + 2 + ($j % 3);
     			$y = $pattern['y'] + 2 + floor($j / 3);
-    			$matrix[$x][$y] = 1;
+    			$this->_patternMatrix[$x][$y] = 1;
     		}
     	}
     }
     
     /**
      * Set the timing patterns (dotted lines between the finder patterns)
-     * @param array $matrix
      */
-    protected function _setTimingPatterns (&$matrix)
+    protected function _setTimingPatterns ()
     {
     	$matrix_dimension = $this->_getMatrixDimension();
     	
     	for($i=0; $i<$matrix_dimension; $i+=2) {
-    		$matrix[$i][6] = 1;
-    		$matrix[6][$i] = 1;
+    		$this->_patternMatrix[$i][6] = 1;
+    		$this->_patternMatrix[6][$i] = 1;
     	}
     	// the lonely pixel
-    	$matrix[8][$matrix_dimension-8] = 1;
+    	$this->_patternMatrix[8][$matrix_dimension-8] = 1;
     }
     
     /**
      * Set the alignment patterns (5x5 squares with a dot in the center)
-     * @param array $matrix
      */
-    protected function _setAlignmentPatterns (&$matrix)
+    protected function _setAlignmentPatterns ()
     {
     	if($this->_version < 2)
     		return;
@@ -767,14 +768,14 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
 
 		if($w * $w - 3 == 1) {
 			$x = $y = $aPattern[0];
-			$this->_setSingleAlignmentPattern(&$matrix, $x, $y);
+			$this->_setSingleAlignmentPattern($x, $y);
 			return;
 		}
 	
 		$cx = $aPattern[0];
 		for($x=1; $x < $w-1; $x++) {
-			$this->_setSingleAlignmentPattern(&$matrix, 6, $cx);
-			$this->_setSingleAlignmentPattern(&$matrix, $cx, 6);
+			$this->_setSingleAlignmentPattern(6, $cx);
+			$this->_setSingleAlignmentPattern($cx, 6);
 			$cx += $d;
 		}
 
@@ -782,7 +783,7 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
 		for($y=0; $y < $w-1; $y++) {
 			$cx = $aPattern[0];
 			for($x=0; $x < $w-1; $x++) {
-				$this->_setSingleAlignmentPattern(&$matrix, $cx, $cy);
+				$this->_setSingleAlignmentPattern($cx, $cy);
 				$cx += $d;
 			}
 			$cy += $d;
@@ -791,27 +792,25 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
     
     /**
      * Set a single alignment pattern
-     * @param array $matrix
      * @param int $x
      * @param int $y
      */
-    protected function _setSingleAlignmentPattern (&$matrix, $x, $y)
+    protected function _setSingleAlignmentPattern ($x, $y)
     {
-    	$matrix[$x][$y] = 1;
+    	$this->_patternMatrix[$x][$y] = 1;
     	for($i=0; $i<5; $i++) {
-    		$matrix[$x - 2 + $i][$y - 2] = 1;
-    		$matrix[$x + 2][$y - 2 + $i] = 1;
-    		$matrix[$x -2 + $i][$y + 2] = 1;
-			$matrix[$x - 2][$y - 2 + $i] = 1;
+    		$this->_patternMatrix[$x - 2 + $i][$y - 2] = 1;
+    		$this->_patternMatrix[$x + 2][$y - 2 + $i] = 1;
+    		$this->_patternMatrix[$x -2 + $i][$y + 2] = 1;
+			$this->_patternMatrix[$x - 2][$y - 2 + $i] = 1;
 		}
     }
     
     /**
      * Set version info pattern (only for version >= 7), 
      * above the lower finder pattern and on the left of the top right finder pattern
-     * @param array $matrix
      */
-    protected function _setVersionPatterns (&$matrix)
+    protected function _setVersionPatterns ()
     {
     	if($this->_version < 7) {
     		return;
@@ -822,8 +821,8 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
     	for($x=0; $x<6; $x++) {
     		for($y=$matrix_dimension-11; $y<=$matrix_dimension-9; $y++) {
     			if($vPattern & 1 == 1) {
-    				$matrix[$x][$y] = 1;
-    				$matrix[$y][$x] = 1;
+    				$this->_patternMatrix[$x][$y] = 1;
+    				$this->_patternMatrix[$y][$x] = 1;
     			}
     			$vPattern = $vPattern >> 1;
     		}

@@ -112,8 +112,14 @@ class Zend_Matrixcode_Qrcode extends Zend_Matrixcode_Abstract
      */
     public function setEccLevel ($level)
     {
-    	if(!empty($level) && array_key_exists($level, Zend_Matrixcode_Qrcode_Qrspecs::$eccLevels)) {
-    		$this->_eccLevel = Zend_Matrixcode_Qrcode_Qrspecs::$eccLevels[strtoupper($level)];
+    	if($level != '') {
+			if(array_key_exists($level, Zend_Matrixcode_Qrcode_Qrspecs::$eccLevels)) {
+				// level specified in letter format ('L', 'M', ...)
+    			$this->_eccLevel = Zend_Matrixcode_Qrcode_Qrspecs::$eccLevels[strtoupper($level)];
+			}else if(in_array($level, Zend_Matrixcode_Qrcode_Qrspecs::$eccLevels)) {
+				// level specified in numeric format (0,1,...)
+				$this->_eccLevel = $level;
+			}
     	}else{
     		require_once 'Zend/Matrixcode/Exception.php';
             throw new Zend_Matrixcode_Qrcode_Exception(

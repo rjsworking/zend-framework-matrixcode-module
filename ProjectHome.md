@@ -1,0 +1,1 @@
+This project contains a Matrixcode module for Zend Framework, with a full implementation of a QR code renderer in svg, pdf, eps and image format.
